@@ -29,7 +29,7 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/<you>/doubao-desktop-mcp
+git clone https://github.com/jarrett53212/doubao-desktop-mcp
 cd doubao-desktop-mcp
 
 # 1. 以调试模式（重新）启动豆包，端口 9222，只监听 127.0.0.1
