@@ -1,0 +1,15 @@
+{
+  "name": "doubao-desktop-mcp",
+  "version": "0.1.0",
+  "description": "Let Claude Code (or any MCP client) talk to the Doubao desktop app on macOS via Chrome DevTools Protocol. Zero dependencies.",
+  "type": "module",
+  "bin": {
+    "doubao-desktop-mcp": "scripts/mcp-server.mjs",
+    "doubao-ask": "scripts/ask.mjs"
+  },
+  "files": ["scripts", "README.md", "LICENSE"],
+  "engines": { "node": ">=22" },
+  "os": ["darwin"],
+  "keywords": ["mcp", "doubao", "claude-code", "cdp", "豆包"],
+  "license": "MIT"
+}
