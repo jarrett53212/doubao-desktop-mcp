@@ -28,7 +28,7 @@ export function askDoubao(opts) {
   return run;
 }
 
-async function askOnce({ prompt, newChat = false, timeoutSec = 180 }) {
+async function askOnce({ prompt, newChat = false, timeoutSec = 600 }) {
   if (!prompt || !prompt.trim()) throw new Error("prompt 不能为空");
   const c = await connectChat();
   try {
@@ -47,23 +47,38 @@ async function askOnce({ prompt, newChat = false, timeoutSec = 180 }) {
     await sleep(300);
     await key(c, "Enter", "Enter", 13, 0, "\r");
 
+    // 完成判定：没有 loading 动画；最后一条回复的操作栏已显示且有「重新生成」；
+    // 若有工作模式的计时器，它必须从「已处理 N 秒」变成「共用时 N 秒」。
+    const doneCheck = `(() => {
+      if (document.querySelector('[data-testid=message_loading]')) return false;
+      const all = document.querySelectorAll('[data-testid=receive_message]');
+      if (all.length <= ${before}) return false;
+      const last = all[all.length - 1];
+      const bar = last.querySelector('[data-testid=message_action_bar]');
+      if (!bar || bar.className.includes('pointer-events-none')) return false;
+      if (!last.querySelector('[data-testid=message_action_regenerate]')) return false;
+      const timer = last.querySelector('[data-testid=preamble-elapsed-timer]');
+      if (timer && !timer.innerText.startsWith('共用时')) return false;
+      return true;
+    })()`;
     const deadline = Date.now() + timeoutSec * 1000;
-    let started = false, done = false;
+    let done = false;
     while (Date.now() < deadline) {
       await sleep(1500);
-      const s = await c.evaluate(
-        `({ n: ${countReplies}, loading: !!document.querySelector('[data-testid=message_loading]') })`,
-      );
-      if (s.n > before || s.loading) started = true;
-      if (started && s.n > before && !s.loading) {
-        await sleep(1500);
-        if (!(await c.evaluate(`!!document.querySelector('[data-testid=message_loading]')`))) { done = true; break; }
+      if (await c.evaluate(doneCheck)) {
+        await sleep(1000); // 防抖：再确认一次
+        if (await c.evaluate(doneCheck)) { done = true; break; }
       }
     }
+    // 只取最终回答：排除工作模式前言（计时器、过程说明）里的文本块
     const reply = await c.evaluate(`(() => {
       const all = document.querySelectorAll('[data-testid=receive_message]');
       if (all.length <= ${before}) return null;
       const last = all[all.length - 1];
+      const pre = last.querySelector('[data-testid=preamble-elapsed]');
+      const blocks = [...last.querySelectorAll('[data-testid=message_text_content]')]
+        .filter((b) => !(pre && pre.contains(b)));
+      if (blocks.length) return blocks.map((b) => b.innerText.trim()).join('\\n\\n');
       const body = last.querySelector('[data-testid=message_content]') || last;
       return body.innerText.trim();
     })()`);

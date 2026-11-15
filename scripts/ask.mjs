@@ -3,7 +3,7 @@
 import { askDoubao } from "./doubao.mjs";
 
 const args = process.argv.slice(2);
-let newChat = false, timeoutSec = 180;
+let newChat = false, timeoutSec = 600;
 const rest = [];
 for (let i = 0; i < args.length; i++) {
   if (args[i] === "--new") newChat = true;

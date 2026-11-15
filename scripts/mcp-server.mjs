@@ -18,7 +18,7 @@ const TOOLS = [
       properties: {
         prompt: { type: "string", description: "发给豆包的消息" },
         new_chat: { type: "boolean", description: "是否新建对话后再发送，默认 false" },
-        timeout_sec: { type: "number", description: "等待回复的最长秒数，默认 180" },
+        timeout_sec: { type: "number", description: "等待回复的最长秒数，默认 600（豆包工作模式联网调研可能要好几分钟）" },
       },
       required: ["prompt"],
     },
@@ -43,7 +43,7 @@ async function callTool(name, args = {}) {
     if (name === "doubao_ask") {
       const s = await status();
       if (!s.running) return text("豆包没有以调试模式运行。请先调用 doubao_start（会重启豆包），或运行 scripts/start-doubao.sh。", true);
-      const r = await askDoubao({ prompt: args.prompt, newChat: !!args.new_chat, timeoutSec: args.timeout_sec || 180 });
+      const r = await askDoubao({ prompt: args.prompt, newChat: !!args.new_chat, timeoutSec: args.timeout_sec || 600 });
       return text(r.complete ? r.reply : `${r.reply}\n\n（注意：等待超时，回复可能不完整）`);
     }
     if (name === "doubao_status") return text(JSON.stringify(await status()));
