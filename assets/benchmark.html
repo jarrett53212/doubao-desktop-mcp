@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Token 对比</title>
+<style>
+  :root { --surface: #fcfcfb; --ink: #0b0b0b; --ink2: #52514e; --muted: #8a8984; --grid: #e6e5e1; --bar: #2a78d6; }
+  * { box-sizing: border-box; margin: 0; }
+  body { width: 1200px; height: 675px; background: var(--surface); color: var(--ink);
+         font-family: -apple-system, "PingFang SC", "Hiragino Sans GB", sans-serif; padding: 64px 80px; }
+  h1 { font-size: 44px; font-weight: 700; letter-spacing: -0.5px; }
+  .sub { margin-top: 12px; font-size: 22px; color: var(--ink2); }
+  .chart { margin-top: 64px; display: grid; grid-template-columns: 250px 1fr; row-gap: 40px; align-items: center; }
+  .label { font-size: 26px; font-weight: 600; }
+  .label small { display: block; font-size: 18px; font-weight: 400; color: var(--ink2); margin-top: 6px; }
+  .track { position: relative; height: 64px; border-left: 2px solid var(--grid); }
+  .bar { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; }
+  .val { position: absolute; top: 50%; transform: translateY(-50%); font-size: 30px; font-weight: 700; white-space: nowrap; }
+  .foot { position: absolute; left: 80px; right: 80px; bottom: 48px; display: flex; justify-content: space-between; font-size: 18px; color: var(--muted); }
+  .hl { color: var(--ink); font-weight: 700; }
+</style>
+</head>
+<body>
+  <h1>Claude 的 token 少用了 <span class="hl">89%</span></h1>
+  <div class="sub">同一个任务：调研 3 个 Markdown 编辑器 + 写 400 字中文对比 · 各跑 3 次取平均</div>
+  <div class="chart">
+    <div class="label">Claude 自己干<small>自己搜网页、自己写 · 35 秒</small></div>
+    <div class="track"><div class="bar" style="width: 82%"></div><span class="val" style="left: calc(82% + 16px)">115,100</span></div>
+    <div class="label">交给豆包<small>doubao_ask · 63 秒</small></div>
+    <div class="track"><div class="bar" style="width: 8.8%"></div><span class="val" style="left: calc(8.8% + 16px)">12,300</span></div>
+  </div>
+  <div class="foot"><span>Claude 消耗 token（输入 + 输出）· 费用 $0.117 → $0.039</span><span>github.com/jarrett53212/doubao-desktop-mcp</span></div>
+</body>
+</html>

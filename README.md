@@ -10,6 +10,20 @@
 你 → Claude Code → doubao_ask("把这段话润色一下…") → 豆包桌面版 → 回复 → Claude Code 接着干活
 ```
 
+## 实测：能省多少
+
+同一个任务（调研 3 个 Markdown 编辑器 + 写约 400 字中文对比），用 `claude -p` 各跑 3 次取平均：
+
+| | Claude 自己搜、自己写 | 交给豆包（`doubao_ask`） |
+|---|---|---|
+| Claude 消耗 token（输入+输出） | ≈ 115,100 | ≈ 12,300（**-89%**） |
+| 按 API 价折算 | $0.117 | $0.039 |
+| 耗时 | 35 秒 | 63 秒 |
+
+![benchmark](assets/benchmark.png)
+
+省下的主要是网页搜索：Claude 自己搜要把网页内容读进上下文，交给豆包只拿回写好的结论。纯写代码的活不适合外包，省不了。
+
 ## 原理
 
 豆包桌面版（DoubaoWork）的 `DoubaoWork.app` 只是一个启动壳，真正的界面跑在内置的 Chromium（`DoubaoWork Browser.app`）里。带上 `--remote-debugging-port` 启动后，它的聊天页就能通过 CDP 操作：
