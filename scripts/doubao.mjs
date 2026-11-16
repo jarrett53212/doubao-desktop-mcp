@@ -78,9 +78,21 @@ async function askOnce({ prompt, newChat = false, timeoutSec = 600 }) {
       const pre = last.querySelector('[data-testid=preamble-elapsed]');
       const blocks = [...last.querySelectorAll('[data-testid=message_text_content]')]
         .filter((b) => !(pre && pre.contains(b)));
-      if (blocks.length) return blocks.map((b) => b.innerText.trim()).join('\\n\\n');
-      const body = last.querySelector('[data-testid=message_content]') || last;
-      return body.innerText.trim();
+      // 链接保留成 Markdown：[文字](网址)，否则 innerText 只剩「链接」两个字
+      const text = (el) => {
+        const c = el.cloneNode(true);
+        c.querySelectorAll('a[href]').forEach((a) => {
+          let href = a.href; const t = a.innerText.trim();
+          try { const u = new URL(href), tg = u.searchParams.get('target'); if (tg && /wtturl|doubao\\.com\\/link/.test(u.host + u.pathname)) href = tg; } catch {}
+          if (/^https?:/.test(href)) a.replaceWith(document.createTextNode(t && t !== href ? '[' + t + '](' + href + ')' : href));
+        });
+        // cloneNode 脱离了布局，innerText 会丢换行；临时挂到页面外再取
+        c.style.cssText = 'position:fixed;left:-99999px;top:0;width:800px';
+        document.body.appendChild(c);
+        const s = c.innerText.trim(); c.remove(); return s;
+      };
+      if (blocks.length) return blocks.map(text).join('\\n\\n');
+      return text(last.querySelector('[data-testid=message_content]') || last);
     })()`);
     const url = await c.evaluate("location.href");
     if (reply == null) throw new Error(`等了 ${timeoutSec} 秒没有收到回复`);
